@@ -7,26 +7,63 @@
 // Example: 5! = 5 x 4 x 3 x 2 x 1 = 120
 // factorial(5); // 120
 var factorial = function(n) {
+    if (n < 0) {
+        return null;
+    }
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
 };
 
 // 2. Compute the sum of an array of integers.
 // sum([1,2,3,4,5,6]); // 21
 var sum = function(array) {
+    return (array.length === 0) ? 0 : array[0] + sum(array.slice(1));
 };
 
 // 3. Sum all numbers in an array containing nested arrays.
 // arraySum([1,[2,3],[[4]],5]); // 15
-var arraySum = function(array) {
-};
+function arraySum(array) {
+  var sum = 0;
+  for (var i = 0; i < array.length; i++) {
+      if (array[i] instanceof Array) {
+          sum += arraySum(array[i]);
+      }
+      if (array[i] === Math.round(array[i])) {
+          sum += array[i];
+      }
+  }
+  return sum;
+}
 
 // 4. Check if a number is even.
 var isEven = function(n) {
+    if (n < 0) {
+        n = -n;
+    }
+    if (n === 0) {
+        return true;
+    }
+    if (n === 1) {
+        return false;
+    }
+    return isEven(n - 2);
 };
 
 // 5. Sum all integers below a given integer.
 // sumBelow(10); // 45
 // sumBelow(7); // 21
 var sumBelow = function(n) {
+    if (n === 0) {
+        return 0;
+    }
+    if (n < 0) {
+        return (n + 1) + sumBelow(n + 1);
+    }
+    if (n > 0) {
+        return (n - 1) + sumBelow(n - 1);
+    }
 };
 
 // 6. Get the integers within a range (x, y).
@@ -93,16 +130,28 @@ var compareStr = function(str1, str2) {
 // 16. Write a function that accepts a string and creates an array where each letter
 // occupies an index of the array.
 var createArray = function(str) {
+    if (str.length === 0) {
+        return [];
+    }
+    return [].concat(str[0]).concat(createArray(str.substr(1)));
 };
 
 // 17. Reverse the order of an array
 var reverseArr = function(array) {
+    if (array.length === 0) {
+        return [];
+    }
+    return [].concat(array.pop()).concat(reverseArr(array));
 };
 
 // 18. Create a new array with a given value and length.
 // buildList(0,5) // [0,0,0,0,0]
 // buildList(7,3) // [7,7,7]
 var buildList = function(value, length) {
+    if (length === 1) {
+        return [value];
+    }
+    return [].concat([value]).concat(buildList(value, length - 1));
 };
 
 // 19. Implement FizzBuzz. Given integer n, return an array of the string representations of 1 to n.
@@ -111,17 +160,44 @@ var buildList = function(value, length) {
 // For numbers which are multiples of both three and five, output “FizzBuzz” instead of the number.
 // fizzBuzz(5) // ['1','2','Fizz','4','Buzz']
 var fizzBuzz = function(n) {
+    var what = n;
+    if (n === 1) {
+        return ['1'];
+    }
+    var previousReturn = fizzBuzz(n - 1);
+    if (n % 3 === 0 && n % 5 === 0) {
+        what = 'FizzBuzz'
+    } else if (n % 3 === 0) {
+        what = 'Fizz'
+    } else if (n % 5 === 0) {
+        what = 'Buzz'
+    } else {
+        what = [n.toString()];
+    }
+    return previousReturn.concat(what);
 };
 
 // 20. Count the occurence of a value in a list.
 // countOccurrence([2,7,4,4,1,4], 4) // 3
 // countOccurrence([2,'banana',4,4,1,'banana'], 'banana') // 2
 var countOccurrence = function(array, value) {
+    if (array.length === 0) {
+        return 0;
+    }
+    if (array.pop() === value) {
+        return 1 + countOccurrence(array, value);
+    } else {
+        return 0 + countOccurrence(array, value);
+    }
 };
 
 // 21. Write a recursive version of map.
 // rMap([1,2,3], timesTwo); // [2,4,6]
 var rMap = function(array, callback) {
+    if (array.length === 0) {
+        return [];
+    }
+    return [callback(array[0])].concat(rMap(array.slice(1), callback));
 };
 
 // 22. Write a function that counts the number of times a key occurs in an object.
@@ -129,6 +205,18 @@ var rMap = function(array, callback) {
 // countKeysInObj(obj, 'r') // 1
 // countKeysInObj(obj, 'e') // 2
 var countKeysInObj = function(obj, key) {
+    var count = 0;
+    for (o in obj) {
+        if (obj.hasOwnProperty(o)) {
+            if (o === key) {
+                count++;
+            }
+            if (typeof obj[o] === 'object') {
+                count += countKeysInObj(obj[o], key);
+            }
+        }
+    }
+    return count;
 };
 
 // 23. Write a function that counts the number of times a value occurs in an object.
@@ -136,11 +224,39 @@ var countKeysInObj = function(obj, key) {
 // countValuesInObj(obj, 'r') // 2
 // countValuesInObj(obj, 'e') // 1
 var countValuesInObj = function(obj, value) {
+    var count = 0;
+    for (o in obj) {
+        if (obj.hasOwnProperty(o)) {
+            if (typeof obj[o] === 'object') {
+                count += countValuesInObj(obj[o], value);
+            } else if (obj[o] === value) {
+                count++;
+            }
+        }
+    }
+    return count;
 };
 
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, oldKey, newKey) {
+    for (o in obj) {
+        if (obj.hasOwnProperty(o)) {
+            if (typeof obj[o] === 'object') {
+                if (o === oldKey) {
+                    obj[newKey] = obj[o];
+                    delete obj[o];
+                    replaceKeysInObj(obj[newKey], oldKey, newKey);
+                } else {
+                    replaceKeysInObj(obj[o], oldKey, newKey);
+                }
+            } else if (o === oldKey) {
+                obj[newKey] = obj[o];
+                delete obj[o];
+            }
+        }
+    }
+    return obj;
 };
 
 // 25. Get the first n Fibonacci numbers. In the Fibonacci sequence, each subsequent
